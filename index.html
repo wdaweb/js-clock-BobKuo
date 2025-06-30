@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pacman Clock</title>
+  <style>
+    @keyframes mouthOpen {
+      0% {
+        background: conic-gradient(#fc0)
+      }
+
+      50% {
+        background: conic-gradient(rgba(0, 0, 0, 0) 30deg,
+            #fc0 30deg,
+            #fc0 330deg,
+            rgba(0, 0, 0, 0) 330deg);
+      }
+
+      100% {
+        background: conic-gradient(#fc0)
+      }
+    }
+
+    @keyframes mouthOpenBlue {
+      0% {
+        background: conic-gradient(#0080ff)
+      }
+
+      50% {
+        background: conic-gradient(rgba(0, 0, 0, 0) 30deg,
+            #0080ff 30deg,
+            #0080ff 330deg,
+            rgba(0, 0, 0, 0) 330deg);
+      }
+
+      100% {
+        background: conic-gradient(#0080ff)
+      }
+    }
+
+    :root {
+      --second-height: 10%;
+      --dot-size-ratio: 2%;
+
+      /* 點距時鐘中心的比例 */
+      --dot-dist-ratio: 45%
+    }
+
+    #clock {
+      width: 500px;
+      height: 500px;
+      background: black;
+      border-radius: 50%;
+
+      position: relative;
+      margin: auto;
+      border: 10px double blue;
+    }
+
+    #second {
+      width: 50%;
+      height: var(--second-height);
+
+      top: calc(50% - calc(var(--second-height) * 0.5));
+      left: 0%;
+
+      transform-origin: right center;
+
+      position: absolute;
+      margin: auto;
+
+      /* background: lightcoral; */
+    }
+
+    #pacman {
+      height: 100%;
+      aspect-ratio: 1 / 1;
+      border-radius: 50%;
+
+      position: absolute;
+
+      background: #fc0;
+
+      animation: mouthOpen 0.5s infinite linear;
+    }
+
+    .dot {
+      height: var(--dot-size-ratio);
+      aspect-ratio: 1 / 1;
+      border-radius: 50%;
+
+      position: absolute;
+      top: calc(50% - calc(var(--dot-size-ratio) * 0.5));
+      left: calc(50% - calc(var(--dot-size-ratio) * 0.5));
+
+      background: #fc0;
+    }
+
+    .big-dot {
+      transform: scale(2);
+    }
+
+    #hour {
+      width: 25%;
+      height: 12px;
+      background: linear-gradient(90deg, #ff6b35, #ff4757);
+      border-radius: 6px;
+
+      position: absolute;
+      left: 25%;
+      top: calc(50% - 6px);
+      transform-origin: right center;
+
+      box-shadow: 0 0 10px rgba(255, 71, 87, 0.5);
+      border: 2px solid #fff;
+    }
+
+    #minute {
+      width: 35%;
+      height: 8px;
+      background: linear-gradient(90deg, #3742fa, #2f3542);
+      border-radius: 4px;
+
+      position: absolute;
+      left: 15%;
+      top: calc(50% - 4px);
+
+      transform-origin: right center;
+      box-shadow: 0 0 8px rgba(59, 66, 250, 0.4);
+      border: 2px solid #fff;
+    }
+
+    .crazy-pacman #pacman {
+      box-shadow:
+        0 0 20px #0080ff,
+        0 0 40px #0080ff,
+        0 0 60px #0080ff,
+        inset 0 0 20px rgba(0, 128, 255, 0.3) !important;
+      animation: blue-glow 0.5s infinite alternate, mouthOpenBlue 0.5s infinite linear !important;
+    }
+
+    @keyframes blue-glow {
+      0% {
+        box-shadow:
+          0 0 20px #0080ff,
+          0 0 40px #0080ff,
+          0 0 60px #0080ff,
+          inset 0 0 20px rgba(0, 128, 255, 0.3);
+      }
+
+      100% {
+        box-shadow:
+          0 0 30px #0080ff,
+          0 0 60px #0080ff,
+          0 0 90px #0080ff,
+          inset 0 0 30px rgba(0, 128, 255, 0.5);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="clock">
+    <div id="hour"></div>
+    <div id="minute"></div>
+    <div id="second">
+      <div id="pacman"></div>
+    </div>
+    <div id="dots">
+    </div>
+  </div>
+
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js'></script>
+  <script>
+    const dotDistRatio = parseFloat($(':root').css('--dot-dist-ratio')) / 100;
+    const origin_distance = ($('#clock').width() * dotDistRatio);
+
+    // 上一個大點的位置
+    let lastBig = null;
+
+    const renderDots = () => {
+
+      for (let i = 0; i < 60; i++) {
+        const dot = $('<div></div>');
+        dot.addClass('dot')
+        $('#dots').append(dot);
+
+        dot.css('transform', `rotate(${i * 6}deg) translateY(${-origin_distance}px)`);
+      }
+    }
+
+    const renderBigDot = () => {
+      // 將之前的大點恢復
+      if (lastBig !== null) {
+        const prevDot = $('.dot').eq(lastBig);
+        const origin_distance = ($('#clock').width() * dotDistRatio);
+        prevDot.css('transform', `rotate(${lastBig * 6}deg) translateY(${-origin_distance}px)`);
+      }
+
+      // 隨機選擇新大點位置
+      const randomNumber = Math.floor(Math.random() * 60);
+      const dot = $('.dot').eq(randomNumber);
+
+      // 設置新大點
+      dot.css('transform', `rotate(${randomNumber * 6}deg) translateY(${-origin_distance}px) scale(2)`);
+
+      lastBig = randomNumber;
+    }
+
+    renderDots()
+    renderBigDot()
+
+    let leftCrazy = 0
+    const clock = () => {
+      const date = new Date()
+      const h = date.getHours()
+      const m = date.getMinutes()
+      const s = date.getSeconds()
+      const ss = s + date.getMilliseconds() / 1000
+
+      // console.log(`${s * 6 + 90}deg`)
+      $('#hour').css('transform', `rotate(${(h % 12) * 30 + (m / 60) * 30 + 90}deg)`)
+      $('#minute').css('transform', `rotate(${m * 6 + (s / 60) * 6 + 90}deg)`)
+      $('#second').css('transform', `rotate(${ss * 6 + 90}deg)`)
+
+      // 移除小點
+      $('.dot').eq(s).css('display', 'none')
+
+      // 碰到大點
+      if (s == lastBig && leftCrazy <= 0) {
+        // 瘋狂狀態 5秒
+        leftCrazy = 5000 / 10
+        $('#second').toggleClass('crazy-pacman')
+      }
+
+      if (leftCrazy > 0) {
+        if (leftCrazy == 1) {
+          // 回復正常
+          $('#second').toggleClass('crazy-pacman')
+
+          // 重新顯示
+          $('.dot').css('display', 'block')
+
+          // 重新生成大點
+          renderBigDot()
+        }
+        leftCrazy--
+      }
+    }
+
+    clock()
+    setInterval(clock, 10)
+
+  </script>
+
+</body>
+
+</html>

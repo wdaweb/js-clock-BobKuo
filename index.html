@@ -51,7 +51,8 @@
     #clock {
       width: 500px;
       height: 500px;
-      background: black;
+      background: black url('./bg.png') no-repeat center center;
+      background-size: 80%;
       border-radius: 50%;
 
       position: relative;
@@ -103,13 +104,13 @@
     }
 
     #hour {
-      width: 25%;
+      width: 30%;
       height: 12px;
       background: linear-gradient(90deg, #ff6b35, #ff4757);
       border-radius: 6px;
 
       position: absolute;
-      left: 25%;
+      left: 20%;
       top: calc(50% - 6px);
       transform-origin: right center;
 
@@ -118,13 +119,13 @@
     }
 
     #minute {
-      width: 35%;
+      width: 40%;
       height: 8px;
       background: linear-gradient(90deg, #3742fa, #2f3542);
       border-radius: 4px;
 
       position: absolute;
-      left: 15%;
+      left: 10%;
       top: calc(50% - 4px);
 
       transform-origin: right center;
